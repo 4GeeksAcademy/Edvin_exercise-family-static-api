@@ -18,25 +18,45 @@ jackson_family = FamilyStructure("Jackson")
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
-    return jsonify(error.to_dict()), error.status_code
+    return jsonify(error.to_dict()), 400
 
 # generate sitemap with all your endpoints
 @app.route('/')
 def sitemap():
-    return generate_sitemap(app)
+    return jsonify({
+        "endpoints": [
+            url_for('handle_hello'),
+            url_for('add_new_member'),
+            url_for('delete_member')
+        ]
+    }), 200
+
 
 @app.route('/members', methods=['GET'])
 def handle_hello():
 
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
+    eesti_perekond = eesti_perekond.get_all_members()
     response_body = {
         "hello": "world",
         "family": members
     }
-
-
     return jsonify(response_body), 200
+
+@app.route('/members', methods=['POST'])
+def add_new_member():
+    member = request.json
+    jackson_family.add_member(member)
+    return jsonify(jackson_family.get_all_members()), 200
+
+
+@app.route('/members/<int:id', methods=['DELETE'])
+def delete_member(id):
+    jackson_family.delete_member(id)
+    return jsonify(jackson_family.get_all_members()), 200
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
