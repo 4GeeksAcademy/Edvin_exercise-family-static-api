@@ -44,7 +44,7 @@ print('jacksons ---->', jackson_family.get_all_members())
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), 400
 
-# generate sitemap with all your endpoints
+# generate sitemap with all your endpoints   #what is this
 @app.route('/')
 def sitemap():
     return generate_sitemap(app), 200
@@ -82,7 +82,7 @@ def add_member():
 @app.route('/members/<int:member_id>', methods=['DELETE'])
 def delete_member(id):
     member = jackson_family.get_member(id)
-    if member in None:
+    if member is None:
         return jsonify({"error": "Member not found"}), 404
     else:
         jackson_family.delete_member(id)
