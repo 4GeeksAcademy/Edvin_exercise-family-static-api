@@ -37,7 +37,6 @@ jackson_family.add_member(john_jackson)
 jackson_family.add_member(jane_jackson)
 jackson_family.add_member(jimmy_jackson)
 
-print('jacksons ---->', jackson_family.get_all_members())
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -51,41 +50,39 @@ def sitemap():
 
 
 @app.route('/members', methods=['GET'])
-def handle_hello():
+def get_all_members():
 
-    # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
     response_body = {
         "Jackson": "world",
-        "family": members
+        "family": members,
+        "age" : "age",
+        "lucky_numbers" : []
     }
     return jsonify(response_body), 200
+
+@app.route('/member/<int:member_id>', methods=['GET'])
+def get_member(member_id):
+    data = jackson_family.get_member(member_id)
+    return jsonify({"data": data}), 200
+    
 
 @app.route('/members', methods=['POST'])
 def add_member():
     data = request.json
-    jackson_family.add_member(data)
-    return jsonify({"Message": "member added successfully"}), 201
-    
-
-## elimar ->
-
-#  try:
-#     response = requests.get('https://jsonplaceholder.typicode.com/posts/1')
-#     response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
-#     data = response.json()  # Parse the JSON response
-#     print(data)
-# except requests.exceptions.RequestException as error:
-#     print("Error:", error)
-# ##
+    try:
+        jackson_family.add_member(data)
+        return jsonify({"Message": "member added successfully"}), 201
+    except Exception as error:
+        return jsonify({error})
 
 @app.route('/members/<int:member_id>', methods=['DELETE'])
-def delete_member(id):
-    member = jackson_family.get_member(id)
+def delete_member(member_id):
+    member = jackson_family.get_member(member_id)
     if member is None:
         return jsonify({"error": "Member not found"}), 404
     else:
-        jackson_family.delete_member(id)
+        jackson_family.delete_member(member_id)
         return jsonify({"done": True}), 200
 
 
